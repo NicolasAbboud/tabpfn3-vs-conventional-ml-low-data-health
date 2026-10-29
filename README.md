@@ -33,10 +33,10 @@ This project compares TabPFN-3 with **Logistic Regression**, **Random Forest** a
 
 Both datasets are public and must be downloaded separately (they are not redistributed here).
 
-| Dataset | Source | Records (raw → cleaned) | Features | Target | Positive prevalence |
-|---------|--------|-------------------------|----------|--------|---------------------|
-| Diabetes Health Indicators (BRFSS 2015) | [Kaggle – Teboul (2021)](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset) | 253,680 → 229,474 | 21 | `Diabetes_binary` | 15.29% (after cleaning) |
-| Cardiovascular Disease | [Kaggle – Ulianova (2018)](https://www.kaggle.com/datasets/sulianova/cardiovascular-disease-dataset) | 70,000 → 68,612 | 11 | `cardio` | 49.48% (test set) |
+| Dataset | Source | Records (raw → cleaned) | Features | Target |
+|---------|--------|-------------------------|----------|--------|
+| Diabetes Health Indicators (BRFSS 2015) | [Kaggle – Teboul (2021)](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset) | 253,680 → 229,474 | 21 | `Diabetes_binary` |
+| Cardiovascular Disease | [Kaggle – Ulianova (2018)](https://www.kaggle.com/datasets/sulianova/cardiovascular-disease-dataset) | 70,000 → 68,612 | 11 | `cardio` |
 
 **Cleaning steps**
 
