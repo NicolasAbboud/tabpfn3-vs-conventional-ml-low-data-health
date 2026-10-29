@@ -1,0 +1,144 @@
+{
+  "protocol_version": "low_data_tabpfn_v1",
+  "tabpfn_model_version": "V3",
+  "inputs": {
+    "tabpfn": {
+      "path": "/kaggle/input/datasets/nicolausdeemese/iu-thesis-results/results/tabpfn/tabpfn_v3_results_final.csv",
+      "sha256": "3188650c62c0834c571579da25bc07e673a9f568e4d2f231145de4a7fbe948d2",
+      "rows": 110
+    },
+    "default": {
+      "path": "/kaggle/input/datasets/nicolausdeemese/iu-thesis-results/results/traditional_ml_default/traditional_ml_default_results.csv",
+      "sha256": "2b02ea87a7bdc527d32a693a7424a0a2af6d68b116a69e0b42ccc1fc2663f63d",
+      "rows": 330
+    },
+    "hpo": {
+      "path": "/kaggle/input/datasets/nicolausdeemese/iu-thesis-results/results/traditional_ml_hpo/traditional_ml_hpo_results_final.csv",
+      "sha256": "52dafe6bf12489964bd0156710f18e0e28211b8365ef92b26098051fbd10252e",
+      "rows": 270
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "numpy": "2.0.2",
+    "pandas": "2.3.3",
+    "matplotlib": "3.11.2",
+    "scipy": "1.16.3"
+  },
+  "design": {
+    "datasets": [
+      "diabetes",
+      "cardiovascular"
+    ],
+    "training_sizes": [
+      8,
+      16,
+      32,
+      64,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096,
+      8192
+    ],
+    "hpo_training_sizes": [
+      32,
+      64,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096,
+      8192
+    ],
+    "subset_seeds": [
+      42,
+      123,
+      456,
+      789,
+      1011
+    ],
+    "test_size": 0.2,
+    "test_seed": 42,
+    "model_seed": 42,
+    "cv_seed": 42,
+    "hpo_seed": 42,
+    "classification_threshold": 0.5
+  },
+  "test_prevalence": {
+    "values": {
+      "diabetes": 0.1529454317264701,
+      "cardiovascular": 0.4947822538331487
+    },
+    "source": "manifest: /kaggle/input/datasets/nicolausdeemese/iu-thesis-nicolas/files/data/processed/experiment_manifest.json"
+  },
+  "statistics": {
+    "interval": "t-based 95% CI over 5 subset seeds (df=4) on paired differences",
+    "stability": "sample SD (ddof=1) of ROC-AUC across subset seeds; pooled by regime as sqrt(mean variance)",
+    "significance_tests": "none (5 seeds); win counts and CIs are descriptive"
+  },
+  "timing_columns": "dropped: runs were not executed on a unified hardware setup",
+  "figures": [
+    "fig01_subset_difficulty",
+    "fig02_variance_decomposition",
+    "fig03_rq1_learning_curves",
+    "fig04_rq1_gap_curves",
+    "fig05_rq1_gap_heatmaps",
+    "fig06_rq1_mean_rank",
+    "fig07_data_efficiency",
+    "fig08_rq1_secondary_metrics",
+    "fig09_operating_point",
+    "fig10_rq2_hpo_effect",
+    "fig11_rq2_signed_gap_roc",
+    "fig12_rq2_signed_gap_pr",
+    "fig13_rq2_outcome_map",
+    "fig14_rq2_cv_optimism",
+    "fig15_rq2_selected_hyperparameters",
+    "fig16_rq3_stability_curves",
+    "fig17_rq3_sd_ratio_heatmaps",
+    "fig18_rq3_worst_case",
+    "fig19_rq3_shared_subset_effect",
+    "fig20_rq3_learning_curve_fits"
+  ],
+  "tables": [
+    "data_efficiency.csv",
+    "headline_roc_auc_default.csv",
+    "paired_differences_long.csv",
+    "rq1_gap_accuracy.csv",
+    "rq1_gap_balanced_accuracy.csv",
+    "rq1_gap_f1.csv",
+    "rq1_gap_pr_auc.csv",
+    "rq1_gap_precision.csv",
+    "rq1_gap_recall.csv",
+    "rq1_gap_roc_auc.csv",
+    "rq1_mean_rank.csv",
+    "rq1_regime_pr_auc.csv",
+    "rq1_regime_roc_auc.csv",
+    "rq1_secondary_gap_summary.csv",
+    "rq1_secondary_regime_summary.csv",
+    "rq2_closure_by_regime.csv",
+    "rq2_cv_optimism.csv",
+    "rq2_hpo_effect_accuracy.csv",
+    "rq2_hpo_effect_balanced_accuracy.csv",
+    "rq2_hpo_effect_f1.csv",
+    "rq2_hpo_effect_pr_auc.csv",
+    "rq2_hpo_effect_precision.csv",
+    "rq2_hpo_effect_recall.csv",
+    "rq2_hpo_effect_roc_auc.csv",
+    "rq2_outcome_classification.csv",
+    "rq2_selected_hyperparameters.csv",
+    "rq3_cell_statistics.csv",
+    "rq3_hpo_effect_on_sd.csv",
+    "rq3_learning_curve_fits.csv",
+    "rq3_pooled_sd_by_regime.csv",
+    "rq3_sd_ratio_by_size.csv",
+    "rq3_sd_trends.csv",
+    "rq3_shared_subset_effect.csv",
+    "scorecard.csv",
+    "seed_results_long.csv",
+    "variance_decomposition.csv"
+  ]
+}
