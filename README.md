@@ -47,59 +47,6 @@ Both datasets are public and must be downloaded separately (they are not redistr
 
 Scaling and encoding are deliberately left out of preparation. Where a model needs scaling, it is fitted inside the model pipeline on the training subset only, to avoid leakage.
 
-## Experimental Design
-
-1. **Data validation and cleaning:** the schema is audited and the SHA-256 hash of each raw file is stored in the manifest.
-2. **Fixed stratified split:** 80/20, seed 42. The test set is never resampled and keeps its natural prevalence.
-3. **Class-balanced subsampling:** sizes 8, 16, 32, 64, 128, 256, 512, 1,024, 2,048, 4,096 and 8,192, with subset seeds 42, 123, 456, 789 and 1011. This gives 110 subsets in total. Subsets are independent draws, not nested, and are stored as index lists in a JSON manifest.
-4. **Model training and evaluation** on the full external test set.
-5. **Paired statistical analysis** (descriptive; no significance tests are used as primary evidence).
-
-**Seed separation.** Four independent random sources are kept apart, so that variation across subset seeds reflects which training rows were drawn:
-
-| Source | Role | Values |
-|--------|------|--------|
-| `subset_seed` | Selects training rows | 42, 123, 456, 789, 1011 |
-| `model_seed` | Estimator randomness | 42 (fixed) |
-| `cv_seed` | CV fold assignment during HPO | 42 (fixed) |
-| `hpo_seed` | Hyperparameter sampling | 42 (fixed) |
-
-All design constants (datasets, sizes, seeds, metrics, threshold, HPO settings, TabPFN version) are defined once in a central protocol module, `experiment_protocol.py` (version `low_data_tabpfn_v1`). Every experimental notebook imports it, and each run asserts that the stored data manifest matches the protocol.
-
-## Models
-
-| Model | Configuration |
-|-------|---------------|
-| **TabPFN-3** | `tabpfn` package v8.3.0, created with `TabPFNClassifier.create_default_for_version(ModelVersion.V3, …)`, `n_estimators="auto"`, `random_state=42`, package defaults otherwise. No HPO, no categorical feature indices. Checkpoint: `tabpfn-v3-classifier-v3_default.ckpt`. Inference on GPU (Tesla T4), test predictions batched in chunks of 1,000 rows. |
-| **Logistic Regression** | `StandardScaler` + `LogisticRegression(max_iter=1000, random_state=42)` (L2, C=1, L-BFGS) |
-| **Random Forest** | `RandomForestClassifier(random_state=42)` (library defaults) |
-| **XGBoost** | `XGBClassifier(objective="binary:logistic", eval_metric="logloss", random_state=42)` (library defaults) |
-
-### Hyperparameter optimization
-
-Each conventional model is tuned on every training subset with **at least 32 observations** (nine sizes) using `RandomizedSearchCV`: 20 sampled configurations, stratified 5-fold CV with shuffling, ROC-AUC as selection criterion, `random_state=42`. The best configuration is refitted on the full subset and evaluated once on the external test set. The test set is never used for tuning. TabPFN-3 is not tuned.
-
-| Model | Search space | Configurations |
-|-------|--------------|----------------|
-| Logistic Regression | `C` ∈ {0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30}, `class_weight` ∈ {None, balanced} | 20 |
-| Random Forest | `n_estimators` ∈ {100, 300}, `max_depth` ∈ {5, 10, None}, `min_samples_leaf` ∈ {1, 5}, `max_features` ∈ {sqrt, log2, None} | 36 |
-| XGBoost | `max_depth` ∈ {3, 6, 9}, `learning_rate` ∈ {0.01, 0.1, 0.3}, `n_estimators` ∈ {100, 300}, `subsample` ∈ {0.8, 1.0}, `colsample_bytree` ∈ {0.8, 1.0} | 72 |
-
-Search-space definitions are hashed and stored in the checkpoint metadata, so a run cannot be resumed under a modified search space.
-
-In total there are **710 final test-evaluation runs**: 330 default conventional runs, 110 TabPFN-3 runs and 270 HPO runs.
-
-## Evaluation
-
-- **Primary metrics:** ROC-AUC and PR-AUC (average precision; chance level equals test prevalence).
-- **Secondary metrics** (threshold 0.5, descriptive only): accuracy, balanced accuracy, precision, recall, F1. Specificity and predicted-positive rate are derived from stored metrics.
-- **Paired differences:** TabPFN-3 minus each conventional model per dataset, size and seed, with seed-win counts (k/5) and aggregation into tiny (8–16), small (32–128), medium (256–1,024) and large (2,048–8,192) regimes.
-- **Data efficiency:** the equivalent training size, i.e. how many labelled observations a conventional model needs to match TabPFN-3 at a reference size, using interpolated learning curves on a log₂ size scale.
-- **Stability:** sample SD of ROC-AUC across the five subset seeds, SD ratios (conventional / TabPFN-3), and the log-SD vs. log-n slope.
-- **Learning-curve fits:** descriptive saturating-curve fits on seed-mean ROC-AUC for n = 32 to 8,192.
-
-The analysis step (Notebook 06) never refits models. It loads the three final result tables and validates them (row counts, key uniqueness, seeds, protocol version, threshold, metric ranges) before building the analysis tables and figures.
-
 ## Environment
 
 | Component | Version |
