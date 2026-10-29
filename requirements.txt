@@ -1,0 +1,10 @@
+ipython==9.7.0
+jupyter
+matplotlib==3.11.2
+numpy==2.0.2
+pandas==2.3.3
+scikit-learn==1.6.1
+scipy==1.16.3
+seaborn==0.13.2
+tabpfn==8.3.0
+xgboost==3.2.0
