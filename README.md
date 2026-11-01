@@ -117,7 +117,7 @@ The repository is organized as follows:
 tabpfn3-vs-conventional-ml-low-data-health/
 │
 ├── data/
-│   └── raw/                     # Source datasets supplied by the user
+│   └── raw/                     
 │
 ├── results/
 │   ├── eda/                     # Exploratory analysis outputs
