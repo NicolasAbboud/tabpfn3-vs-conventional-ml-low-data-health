@@ -4,7 +4,6 @@
 
 **Author:** Nicolas Abboud 
 <br>
-<br>
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![TabPFN](https://img.shields.io/badge/TabPFN-3-orange.svg)](https://github.com/PriorLabs/TabPFN)
