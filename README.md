@@ -50,7 +50,7 @@ The study does not assume that either paradigm is inherently superior. Instead, 
 
 ### 3.1 Datasets
 
-Two publicly available binary health-classification datasets are used.
+Two publicly available health-classification datasets are used.
 
 | Dataset | Original records | Records after cleaning | Predictors | Target |
 |---|---:|---:|---:|---|
