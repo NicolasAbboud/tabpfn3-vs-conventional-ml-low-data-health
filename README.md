@@ -30,7 +30,7 @@ The study comprises two connected experimental stages:
 
 1. **Main Balanced Low-Data Benchmark (Notebooks `01`–`06`):** Models are evaluated across eleven balanced (50/50) training-set sizes, from 8 to 8,192 observations, under controlled experimental conditions. Conventional models are evaluated both with default configurations and after hyperparameter optimization (HPO), alongside an analysis of predictive stability across training subsets.
 
-2. **Class-Imbalance Sensitivity Extension (Notebook `07`):** Models are evaluated across four non-balanced training positive-class ratios (`30/70`, `40/60`, `60/40`, and `70/30`) at four representative training sizes (`128`, `512`, `2,048`, and `8,192`) to assess how shifting training class distributions affects discrimination, probability calibration, and threshold-dependent behavior relative to the 50/50 reference condition.
+2. **Class-Imbalance Sensitivity Extension (Notebook `07`):** Models are evaluated across four non-balanced training positive-class ratios (`30/70`, `40/60`, `60/40`, and `70/30`) at four representative training sizes (`128`, `512`, `2,048`, and `8,192`) to assess the influence of shifting training class distributions relative to the 50/50 reference condition.
 
 The repository contains the notebooks, shared Python modules, experimental configuration, and analysis code used in the study.
 
@@ -222,7 +222,6 @@ data/
 
 ```
 
-The diabetes file is read as a comma-separated CSV. The cardiovascular file is read as a semicolon-separated CSV.
 
 **Important:** Preserve the expected column names and schema. The data loader checks the supplied files against the declared dataset configuration and raises an error if columns are missing or unexpected.
 
@@ -264,10 +263,6 @@ Reproducibility is supported through a centralized experimental protocol and aut
 ### Centralized configuration
 
 `experiment_protocol.py` defines the training sizes, subset seeds, model-side seed, cross-validation seed, HPO seed, classification threshold, primary metrics, and HPO settings.
-
-The shared protocol identifier is:
-
-`low_data_tabpfn_v1` (with the class-imbalance extension tagged as `study_version = class_balance_v1`).
 
 ### Deterministic subset generation
 
