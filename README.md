@@ -24,13 +24,16 @@ The evaluation compares TabPFN-3 with three established classifiers:
 - Random Forest (RF)
 - XGBoost
 
-The models are evaluated across eleven training-set sizes, from 8 to 8,192 observations, under controlled experimental conditions. Conventional models are evaluated both with default configurations and after hyperparameter optimization (HPO). The study also examines how predictive performance and its variability across training subsets change as training-set size increases.
+The study comprises two connected experimental stages:
+
+1. **Main Balanced Low-Data Benchmark (Notebooks `01`–`06`):** Models are evaluated across eleven balanced (50/50) training-set sizes, from 8 to 8,192 observations, under controlled experimental conditions. Conventional models are evaluated both with default configurations and after hyperparameter optimization (HPO), alongside an analysis of predictive stability across training subsets.
+2. **Class-Imbalance Sensitivity Extension (Notebook `07`):** Models are evaluated across four non-balanced training positive-class ratios (`30/70`, `40/60`, `60/40`, and `70/30`) at four representative training sizes (`128`, `512`, `2,048`, and `8,192`) to assess how shifting training class distributions affects discrimination, probability calibration, and threshold-dependent behavior relative to the 50/50 reference condition.
 
 The repository contains the notebooks, shared Python modules, experimental configuration, and analysis code used in the study.
 
 ## 2. Research Questions
 
-The experiments address three research questions.
+The experiments address four research questions.
 
 **RQ1 — Comparative performance**
 
@@ -44,6 +47,7 @@ To what extent does hyperparameter optimization narrow or reverse the performanc
 
 How does training-set size affect the predictive performance and training-subset stability of TabPFN-3 relative to conventional machine-learning models?
 
+
 The study does not assume that either paradigm is inherently superior. Instead, it evaluates their relative performance empirically under a shared experimental protocol.
 
 ## 3. Experimental Design
@@ -52,10 +56,10 @@ The study does not assume that either paradigm is inherently superior. Instead, 
 
 Two publicly available health-classification datasets are used.
 
-| Dataset | Original records | Records after cleaning | Predictors | Target |
-|---|---:|---:|---:|---|
-| Diabetes Health Indicators (BRFSS 2015) | 253,680 | 229,474 | 21 | `Diabetes_binary` |
-| Cardiovascular Disease | 70,000 | 68,612 | 11 | `cardio` |
+| Dataset | Original records | Records after cleaning | Predictors | Target | Natural test prevalence |
+|---|---:|---:|---:|---|---:|
+| Diabetes Health Indicators (BRFSS 2015) | 253,680 | 229,474 | 21 | `Diabetes_binary` | ~15.29% |
+| Cardiovascular Disease | 70,000 | 68,612 | 11 | `cardio` | ~49.48% |
 
 **Dataset sources**
 
@@ -74,38 +78,38 @@ The preprocessing pipeline includes:
 
 The test partition retains the natural class prevalence and remains fixed across all experimental conditions. Model-dependent transformations, such as feature scaling, are fitted within the training pipeline to avoid leakage from test observations.
 
-### 3.3 Low-data training subsets
+### 3.3 Low-data training subsets and class-imbalance design
 
-Training subsets are sampled exclusively from each dataset's training partition.
-
-The evaluated training sizes are:
-
-`8, 16, 32, 64, 128, 256, 512, 1,024, 2,048, 4,096, 8,192`
-
-Five subset seeds are used:
+Training subsets are sampled exclusively from each dataset's training partition using five subset seeds:
 
 `42, 123, 456, 789, 1011`
 
-Each subset contains equal numbers of positive and negative observations. Subsets are sampled independently across training sizes rather than constructed as nested extensions of smaller subsets.
+Subsets are sampled independently across conditions rather than constructed as nested extensions of smaller subsets.
 
-This design supports a controlled comparison of performance across data-availability conditions. Because the test set retains the original class distribution, threshold-dependent metrics are interpreted with particular care.
+- **Balanced 50/50 benchmark (`02`–`06`):** Evaluates eleven training sizes (`8, 16, 32, 64, 128, 256, 512, 1,024, 2,048, 4,096, 8,192`) with equal numbers of positive and negative observations.
+- **Class-imbalance experiment (`07`):** Evaluates four training sizes (`128, 512, 2,048, 8,192`) across four positive-class ratios (`0.30, 0.40, 0.60, 0.70`, i.e., `30/70`, `40/60`, `60/40`, and `70/30`), using the 50/50 runs at matching sizes as the balanced reference condition.
+
+Because the test set retains each dataset's natural class distribution (~49.48% positive for Cardiovascular; ~15.29% positive for Diabetes), threshold-dependent metrics are interpreted with particular care.
 
 ### 3.4 Model evaluation
 
-TabPFN-3 is evaluated using the V3 model version and its default configuration. Logistic Regression, Random Forest, and XGBoost are evaluated using their default configurations for RQ1 and optimized configurations for RQ2.
+TabPFN-3 is evaluated using the V3 model version (`tabpfn_v3`) and its default configuration. In the balanced 50/50 benchmark, Logistic Regression, Random Forest, and XGBoost are evaluated using both default configurations (RQ1) and optimized configurations (RQ2). In the class-imbalance extension (RQ4), conventional models are evaluated using their default configurations to match the default baseline protocol.
 
-Hyperparameter optimization uses randomized search with 20 sampled configurations, stratified five-fold cross-validation, and ROC-AUC as the selection criterion. HPO is performed for training sizes of at least 32 observations; the two smallest training sizes remain baseline-only conditions.
+Hyperparameter optimization in the balanced experiment uses randomized search with 20 sampled configurations, stratified five-fold cross-validation, and ROC-AUC as the selection criterion. HPO is performed for training sizes of at least 32 observations; the two smallest training sizes remain baseline-only conditions.
 
-All models are evaluated on the same held-out test partition for each dataset.
+All models are evaluated on the held-out test partition for each dataset.
 
 ### 3.5 Evaluation metrics
 
 The primary evaluation metrics are:
 
 - **ROC-AUC:** Area under the receiver operating characteristic curve.
-- **PR-AUC:** Precision–recall performance, computed as average precision in this implementation.
+- **PR-AUC:** Precision–recall performance, computed as average precision in this implementation (alongside `PR-AUC lift` over natural test prevalence in the class-imbalance study).
 
-Secondary metrics include accuracy, balanced accuracy, precision, recall, and F1-score. Specificity and predicted-positive rate are also examined to characterize behaviour at the fixed classification threshold of 0.5.
+Secondary metrics include accuracy, balanced accuracy, precision, recall, specificity, and F1-score:
+
+- In the balanced 50/50 benchmark (`03`–`06`), threshold-dependent metrics and predicted-positive rate are computed at the fixed raw probability threshold of `0.5`.
+- In the class-imbalance experiment (`07`), metrics are evaluated both at the raw `0.5` threshold (`_raw`) and after Bayes prior correction adjusting predicted probabilities from the training class ratio to the natural test prevalence (`_corr`), together with probability calibration metrics (log-loss, Brier score, and expected calibration error).
 
 Training-subset stability is assessed through the standard deviation of ROC-AUC across the five subset seeds at each training size and experimental condition.
 
@@ -129,6 +133,7 @@ tabpfn3-vs-conventional-ml-low-data-health/
 ├── 04_tabpfn.ipynb
 ├── 05_traditional_ml_hpo.ipynb
 ├── 06_results_analysis.ipynb
+├── 07_class_balance_experiment.ipynb
 │
 ├── data_pipeline.py             # Shared loading and preprocessing
 ├── experiment_protocol.py       # Central experimental configuration
@@ -136,19 +141,6 @@ tabpfn3-vs-conventional-ml-low-data-health/
 ├── requirements.txt             # Python dependencies
 └── README.md
 ```
-
-### Notebook responsibilities
-
-| Notebook | Purpose |
-|---|---|
-| `01_data_exploration.ipynb` | Data inspection and exploratory analysis |
-| `02_data_preparation.ipynb` | Data cleaning, partitioning, and subset generation |
-| `03_traditional_ml.ipynb` | Evaluation of default conventional models |
-| `04_tabpfn.ipynb` | Evaluation of TabPFN-3 |
-| `05_traditional_ml_hpo.ipynb` | Hyperparameter optimization and evaluation |
-| `06_results_analysis.ipynb` | Result validation, comparative analysis, and figures |
-
-The shared modules centralize functionality and configuration to reduce inconsistencies between experimental notebooks.
 
 ## 5. Installation and Setup
 
