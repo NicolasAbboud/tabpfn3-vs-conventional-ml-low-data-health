@@ -95,7 +95,7 @@ Because the test set retains each dataset's natural class distribution (\~49.48%
 
 ### 3.4 Model evaluation
 
-TabPFN-3 is evaluated using the V3 model version (`tabpfn_v3`) and its default configuration. In the balanced 50/50 benchmark, Logistic Regression, Random Forest, and XGBoost are evaluated using both default configurations (RQ1) and optimized configurations (RQ2). In the class-imbalance extension (RQ4), conventional models are evaluated using their default configurations to match the default baseline protocol.
+TabPFN-3 is evaluated using the V3 model version (`tabpfn_v3`) and its default configuration. In the balanced 50/50 benchmark, Logistic Regression, Random Forest, and XGBoost are evaluated using both default configurations (RQ1) and optimized configurations (RQ2). In the class-imbalance extension, conventional models are evaluated using their default configurations to match the default baseline protocol.
 
 Hyperparameter optimization in the balanced experiment uses randomized search with 20 sampled configurations, stratified five-fold cross-validation, and ROC-AUC as the selection criterion. HPO is performed for training sizes of at least 32 observations; the two smallest training sizes remain baseline-only conditions.
 
